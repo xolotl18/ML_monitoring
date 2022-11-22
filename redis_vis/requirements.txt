@@ -1,0 +1,9 @@
+flake8==5.0.4
+black==22.10.0
+redis==4.3.4
+torch==1.12.1
+torchaudio==0.12.1
+pandas==1.5.1
+panel==0.14.0
+holoviews==1.15.1
+hvplot==0.8.1

@@ -1,0 +1,25 @@
+{
+    "python.languageServer": "Default",
+    "python.formatting.autopep8Path": "",
+    "python.linting.flake8Enabled": true,
+    "python.linting.enabled": true,
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportMissingModuleSource": "none",
+        "reportMissingImports": "none",
+    },
+    "python.formatting.provider": "black",
+    "python.formatting.blackArgs": [
+        "-l",
+        "80",
+        "-t",
+        "py39",
+        "--skip-string-normalization"
+    ],
+    "[python]": {
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.organizeImports": true,
+        }
+      },
+      "files.trimTrailingWhitespace": true,
+}
