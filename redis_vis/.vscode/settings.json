@@ -12,7 +12,7 @@
         "-l",
         "80",
         "-t",
-        "py39",
+        "redisvis",
         "--skip-string-normalization"
     ],
     "[python]": {
