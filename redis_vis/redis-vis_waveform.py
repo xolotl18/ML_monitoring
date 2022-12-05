@@ -1,8 +1,5 @@
-import os
 import pickle
 
-import holoviews as hv
-import numpy as np
 import pandas as pd
 import panel as pn
 import param
@@ -17,6 +14,7 @@ for file in r.keys(pattern='signal:*'):
     FILES.append(int(file.decode('utf-8').split(':')[-1]))
 FILES.sort()
 
+
 class Data(param.Parameterized):
     files = param.Selector(FILES)
 
@@ -28,11 +26,10 @@ class Data(param.Parameterized):
         y_axis = pickle.loads(r.hget(name="signal:"+str(filename), key='y'))
         z_axis = pickle.loads(r.hget(name="signal:"+str(filename), key='z'))
 
-        sampling_freq = 2000
         signal = {
-            'x' : x_axis,
-            'y' : y_axis,
-            'z' : z_axis
+            'x': x_axis[:20000],
+            'y': y_axis[:20000],
+            'z': z_axis[:20000]
         }
         data_chunk = pd.DataFrame(signal)
 
@@ -54,6 +51,7 @@ class Waveform(Data):
 
         row = pn.Row(data_plot)
         return row
+
 
 layout = pn.Column()
 waveform1 = Waveform()

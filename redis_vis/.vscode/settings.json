@@ -1,5 +1,7 @@
 {
-    "python.languageServer": "Default",
+  "editor.rulers": [79],
+  "python.defaultInterpreterPath": "/home/giacomo/Desktop/ML_monitoring/redis_vis/redisvis/bin/python",
+  "python.languageServer": "Default",
     "python.formatting.autopep8Path": "",
     "python.linting.flake8Enabled": true,
     "python.linting.enabled": true,
