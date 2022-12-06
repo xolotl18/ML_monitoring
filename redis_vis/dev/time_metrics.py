@@ -1,5 +1,5 @@
-# misura tempo per fare tensorset, modelrun e tensorget da redis
-# misura differenza di tempo di esecuzione tra np.tobytes/frombuffer e pickle
+# measure the latency of each operation performed when computing the fft with
+# redis and also the total latency, then save the results to a .csv file
 
 import time
 from statistics import mean

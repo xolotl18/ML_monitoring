@@ -1,0 +1,5 @@
+gb = GearsBuilder()
+gb.map(lambda x: x['key'])
+gb.filter(lambda x: x.startswith('tensor:'))
+gb.foreach(lambda x : execute('expire', x, '10'))
+gb.register()

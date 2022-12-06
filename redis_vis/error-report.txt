@@ -1,0 +1,132 @@
+1:M 05 Dec 2022 17:28:58.317 # Redis 6.2.6 crashed by signal: 6, si_code: -6
+1:M 05 Dec 2022 17:28:58.317 # Killed by PID: 1, UID: 0
+1:M 05 Dec 2022 17:28:58.317 # Crashed running the instruction at: 0x7fcdc6fdde87
+
+------ STACK TRACE ------
+EIP:
+/lib/x86_64-linux-gnu/libc.so.6(gsignal+0xc7)[0x7fcdc6fdde87]
+
+Backtrace:
+/lib/x86_64-linux-gnu/libpthread.so.0(+0x12980)[0x7fcdc73a2980]
+/lib/x86_64-linux-gnu/libc.so.6(gsignal+0xc7)[0x7fcdc6fdde87]
+/lib/x86_64-linux-gnu/libc.so.6(abort+0x141)[0x7fcdc6fdf7f1]
+/usr/lib/x86_64-linux-gnu/libstdc++.so.6(+0x8c957)[0x7fcdc5103957]
+terminate called after throwing an instance of 'c10::Error'
+  what():  isTuple()INTERNAL ASSERT FAILED at "../aten/src/ATen/core/ivalue_inl.h":1916, please report a bug to PyTorch. Expected Tuple but got String
+Exception raised from toTupleRef at ../aten/src/ATen/core/ivalue_inl.h:1916 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x6b (0x7fcdc86877ab in /usr/lib/redis/modules/backends/redisai_torch/lib/libc10.so)
+frame #1: c10::detail::torchCheckFail(char const*, char const*, unsigned int, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) + 0xce (0x7fcdc868315e in /usr/lib/redis/modules/backends/redisai_torch/lib/libc10.so)
+frame #2: c10::detail::torchInternalAssertFail(char const*, char const*, unsigned int, char const*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) + 0x4e (0x7fcdc8684efe in /usr/lib/redis/modules/backends/redisai_torch/lib/libc10.so)
+frame #3: <unknown function> + 0x35cb877 (0x7fcd3b016877 in /usr/lib/redis/modules/backends/redisai_torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x35cbad5 (0x7fcd3b016ad5 in /usr/lib/redis/modules/backends/redisai_torch/lib/libtorch_cpu.so)
+frame #5: torch::jit::SourceRange::highlight(std::ostream&) const + 0x3d (0x7fcd38c56e7d in /usr/lib/redis/modules/backends/redisai_torch/lib/libtorch_cpu.so)
+frame #6: torch::jit::ErrorReport::what() const + 0x351 (0x7fcd38c3a021 in /usr/lib/redis/modules/backends/redisai_torch/lib/libtorch_cpu.so)
+frame #7: torchLoadModel + 0x488 (0x7fcdb81de2a8 in /usr/lib/redis/modules/backends/redisai_torch/redisai_torch.so)
+frame #8: RAI_ModelCreateTorch + 0xbb (0x7fcdb81d474b in /usr/lib/redis/modules/backends/redisai_torch/redisai_torch.so)
+frame #9: RAI_ModelCreate + 0x1ae (0x7fcdc63e4e8e in /usr/lib/redis/modules)
+frame #10: ModelSetCommand + 0x833 (0x7fcdc63d8ef3 in /usr/lib/redis/modules)
+frame #11: RedisModuleCommandDispatcher + 0x66 (0x555e3d6d9f16 in redis-server *:6379)
+frame #12: call + 0x9c (0x555e3d64da8c in redis-server *:6379)
+frame #13: processCommand + 0x5ee (0x555e3d64f69e in redis-server *:6379)
+frame #14: processCommandAndResetClient + 0x1c (0x555e3d66316c in redis-server *:6379)
+frame #15: processInputBuffer + 0xea (0x555e3d665aba in redis-server *:6379)
+frame #16: <unknown function> + 0xfbdba (0x555e3d6fbdba in redis-server *:6379)
+frame #17: aeProcessEvents + 0x1b7 (0x555e3d6461f7 in redis-server *:6379)
+frame #18: aeMain + 0x1d (0x555e3d6465ed in redis-server *:6379)
+frame #19: main + 0x30a (0x555e3d6429fa in redis-server *:6379)
+frame #20: __libc_start_main + 0xe7 (0x7fcdc6fc0c87 in /lib/x86_64-linux-gnu/libc.so.6)
+frame #21: _start + 0x2a (0x555e3d642f1a in redis-server *:6379)
+
+/usr/lib/x86_64-linux-gnu/libstdc++.so.6(+0x92ae6)[0x7fcdc5109ae6]
+/usr/lib/x86_64-linux-gnu/libstdc++.so.6(+0x91b49)[0x7fcdc5108b49]
+/usr/lib/x86_64-linux-gnu/libstdc++.so.6(__gxx_personality_v0+0x2a8)[0x7fcdc51094b8]
+/lib/x86_64-linux-gnu/libgcc_s.so.1(+0x10573)[0x7fcdc4e6f573]
+/lib/x86_64-linux-gnu/libgcc_s.so.1(_Unwind_Resume+0x125)[0x7fcdc4e6fdf5]
+/usr/lib/redis/modules/backends/redisai_torch/lib/libtorch_cpu.so(+0x35cb987)[0x7fcd3b016987]
+/usr/lib/redis/modules/backends/redisai_torch/lib/libtorch_cpu.so(+0x35cbad5)[0x7fcd3b016ad5]
+/usr/lib/redis/modules/backends/redisai_torch/lib/libtorch_cpu.so(_ZNK5torch3jit11SourceRange9highlightERSo+0x3d)[0x7fcd38c56e7d]
+/usr/lib/redis/modules/backends/redisai_torch/lib/libtorch_cpu.so(_ZNK5torch3jit11ErrorReport4whatEv+0x351)[0x7fcd38c3a021]
+/usr/lib/redis/modules/backends/redisai_torch/redisai_torch.so(torchLoadModel+0x488)[0x7fcdb81de2a8]
+/usr/lib/redis/modules/backends/redisai_torch/redisai_torch.so(RAI_ModelCreateTorch+0xbb)[0x7fcdb81d474b]
+/usr/lib/redis/modules(RAI_ModelCreate+0x1ae)[0x7fcdc63e4e8e]
+/usr/lib/redis/modules(ModelSetCommand+0x833)[0x7fcdc63d8ef3]
+redis-server *:6379(RedisModuleCommandDispatcher+0x66)[0x555e3d6d9f16]
+redis-server *:6379(call+0x9c)[0x555e3d64da8c]
+redis-server *:6379(processCommand+0x5ee)[0x555e3d64f69e]
+redis-server *:6379(processCommandAndResetClient+0x1c)[0x555e3d66316c]
+redis-server *:6379(processInputBuffer+0xea)[0x555e3d665aba]
+redis-server *:6379(+0xfbdba)[0x555e3d6fbdba]
+redis-server *:6379(aeProcessEvents+0x1b7)[0x555e3d6461f7]
+redis-server *:6379(aeMain+0x1d)[0x555e3d6465ed]
+redis-server *:6379(main+0x30a)[0x555e3d6429fa]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xe7)[0x7fcdc6fc0c87]
+redis-server *:6379(_start+0x2a)[0x555e3d642f1a]
+
+
+
+
+SECOND ERROR report
+
+1:M 05 Dec 2022 18:03:47.913 # Redis 6.2.6 crashed by signal: 6, si_code: -6
+1:M 05 Dec 2022 18:03:47.913 # Killed by PID: 1, UID: 0
+1:M 05 Dec 2022 18:03:47.913 # Crashed running the instruction at: 0x7fa3d8fe6e87
+
+------ STACK TRACE ------
+EIP:
+/lib/x86_64-linux-gnu/libc.so.6(gsignal+0xc7)[0x7fa3d8fe6e87]
+
+Backtrace:
+/lib/x86_64-linux-gnu/libpthread.so.0(+0x12980)[0x7fa3d93ab980]
+/lib/x86_64-linux-gnu/libc.so.6(gsignal+0xc7)[0x7fa3d8fe6e87]
+/lib/x86_64-linux-gnu/libc.so.6(abort+0x141)[0x7fa3d8fe87f1]
+/usr/lib/x86_64-linux-gnu/libstdc++.so.6(+0x8c957)[0x7fa3d708d957]
+/usr/lib/x86_64-linux-gnu/libstdc++.so.6(+0x92ae6)[0x7fa3d7093ae6]
+terminate called after throwing an instance of 'c10::Error'
+  what():  isTuple()INTERNAL ASSERT FAILED at "../aten/src/ATen/core/ivalue_inl.h":1916, please report a bug to PyTorch. Expected Tuple but got String
+Exception raised from toTupleRef at ../aten/src/ATen/core/ivalue_inl.h:1916 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x6b (0x7fa3da6907ab in /usr/lib/redis/modules/backends/redisai_torch/lib/libc10.so)
+frame #1: c10::detail::torchCheckFail(char const*, char const*, unsigned int, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) + 0xce (0x7fa3da68c15e in /usr/lib/redis/modules/backends/redisai_torch/lib/libc10.so)
+frame #2: c10::detail::torchInternalAssertFail(char const*, char const*, unsigned int, char const*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) + 0x4e (0x7fa3da68defe in /usr/lib/redis/modules/backends/redisai_torch/lib/libc10.so)
+frame #3: <unknown function> + 0x35cb877 (0x7fa34ce16877 in /usr/lib/redis/modules/backends/redisai_torch/lib/libtorch_cpu.so)
+frame #4: <unknown function> + 0x35cbad5 (0x7fa34ce16ad5 in /usr/lib/redis/modules/backends/redisai_torch/lib/libtorch_cpu.so)
+frame #5: torch::jit::SourceRange::highlight(std::ostream&) const + 0x3d (0x7fa34aa56e7d in /usr/lib/redis/modules/backends/redisai_torch/lib/libtorch_cpu.so)
+frame #6: torch::jit::ErrorReport::what() const + 0x351 (0x7fa34aa3a021 in /usr/lib/redis/modules/backends/redisai_torch/lib/libtorch_cpu.so)
+frame #7: torchLoadModel + 0x488 (0x7fa3cc1df2a8 in /usr/lib/redis/modules/backends/redisai_torch/redisai_torch.so)
+frame #8: RAI_ModelCreateTorch + 0xbb (0x7fa3cc1d574b in /usr/lib/redis/modules/backends/redisai_torch/redisai_torch.so)
+frame #9: RAI_ModelCreate + 0x1ae (0x7fa3d83e4e8e in /usr/lib/redis/modules)
+frame #10: ModelSetCommand + 0x833 (0x7fa3d83d8ef3 in /usr/lib/redis/modules)
+frame #11: RedisModuleCommandDispatcher + 0x66 (0x560aa96d9f16 in redis-server *:6379)
+frame #12: call + 0x9c (0x560aa964da8c in redis-server *:6379)
+frame #13: processCommand + 0x5ee (0x560aa964f69e in redis-server *:6379)
+frame #14: processCommandAndResetClient + 0x1c (0x560aa966316c in redis-server *:6379)
+frame #15: processInputBuffer + 0xea (0x560aa9665aba in redis-server *:6379)
+frame #16: <unknown function> + 0xfbdba (0x560aa96fbdba in redis-server *:6379)
+frame #17: aeProcessEvents + 0x1b7 (0x560aa96461f7 in redis-server *:6379)
+frame #18: aeMain + 0x1d (0x560aa96465ed in redis-server *:6379)
+frame #19: main + 0x30a (0x560aa96429fa in redis-server *:6379)
+frame #20: __libc_start_main + 0xe7 (0x7fa3d8fc9c87 in /lib/x86_64-linux-gnu/libc.so.6)
+frame #21: _start + 0x2a (0x560aa9642f1a in redis-server *:6379)
+
+/usr/lib/x86_64-linux-gnu/libstdc++.so.6(+0x91b49)[0x7fa3d7092b49]
+/usr/lib/x86_64-linux-gnu/libstdc++.so.6(__gxx_personality_v0+0x2a8)[0x7fa3d70934b8]
+/lib/x86_64-linux-gnu/libgcc_s.so.1(+0x10573)[0x7fa3d6df9573]
+/lib/x86_64-linux-gnu/libgcc_s.so.1(_Unwind_Resume+0x125)[0x7fa3d6df9df5]
+/usr/lib/redis/modules/backends/redisai_torch/lib/libtorch_cpu.so(+0x35cb987)[0x7fa34ce16987]
+/usr/lib/redis/modules/backends/redisai_torch/lib/libtorch_cpu.so(+0x35cbad5)[0x7fa34ce16ad5]
+/usr/lib/redis/modules/backends/redisai_torch/lib/libtorch_cpu.so(_ZNK5torch3jit11SourceRange9highlightERSo+0x3d)[0x7fa34aa56e7d]
+/usr/lib/redis/modules/backends/redisai_torch/lib/libtorch_cpu.so(_ZNK5torch3jit11ErrorReport4whatEv+0x351)[0x7fa34aa3a021]
+/usr/lib/redis/modules/backends/redisai_torch/redisai_torch.so(torchLoadModel+0x488)[0x7fa3cc1df2a8]
+/usr/lib/redis/modules/backends/redisai_torch/redisai_torch.so(RAI_ModelCreateTorch+0xbb)[0x7fa3cc1d574b]
+/usr/lib/redis/modules(RAI_ModelCreate+0x1ae)[0x7fa3d83e4e8e]
+/usr/lib/redis/modules(ModelSetCommand+0x833)[0x7fa3d83d8ef3]
+redis-server *:6379(RedisModuleCommandDispatcher+0x66)[0x560aa96d9f16]
+redis-server *:6379(call+0x9c)[0x560aa964da8c]
+redis-server *:6379(processCommand+0x5ee)[0x560aa964f69e]
+redis-server *:6379(processCommandAndResetClient+0x1c)[0x560aa966316c]
+redis-server *:6379(processInputBuffer+0xea)[0x560aa9665aba]
+redis-server *:6379(+0xfbdba)[0x560aa96fbdba]
+redis-server *:6379(aeProcessEvents+0x1b7)[0x560aa96461f7]
+redis-server *:6379(aeMain+0x1d)[0x560aa96465ed]
+redis-server *:6379(main+0x30a)[0x560aa96429fa]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xe7)[0x7fa3d8fc9c87]
+redis-server *:6379(_start+0x2a)[0x560aa9642f1a]

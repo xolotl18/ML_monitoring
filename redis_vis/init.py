@@ -12,7 +12,7 @@ r = redis.Redis(host='localhost', port=6379)
 
 # storing the model in Redis
 
-fft_model = ml2rt.load_model('fft.pt')
+fft_model = ml2rt.load_model('./scripts/fft.pt')
 out = con.modelset('model:fft', 'torch', 'cpu', fft_model)
 print(out)
 

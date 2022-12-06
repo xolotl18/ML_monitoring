@@ -1,3 +1,4 @@
+# generate the fft script as a torch model and save it in jit script format
 import torch
 
 
