@@ -3,8 +3,10 @@
 # the fft visualization triggers a redis ai model to convert the signal,
 # stored as a key, to a spectrum and then displays it
 
+from io import BytesIO
+
 import holoviews as hv
-import ml2rt
+# import ml2rt
 import numpy as np
 import pandas as pd
 import panel as pn
@@ -25,31 +27,22 @@ for file in r.keys(pattern='signal:*'):
     FILES.append(int(file.decode('utf-8').split(':')[-1]))
 FILES.sort()
 
-processed_signals = [0 for i in np.arange(len(FILES))]
-
 
 class Data(param.Parameterized):
     files = param.Selector(FILES)
 
     @staticmethod
-    def get_df(filename):
-        # get the data from redis and put it in a dataframe with columns
-        # x, y, z and time
-        x_axis = np.frombuffer(r.hget(name="signal:"+str(filename), key='x'),
-                               dtype=np.float32)
-        y_axis = np.frombuffer(r.hget(name="signal:"+str(filename), key='y'),
-                               dtype=np.float32)
-        z_axis = np.frombuffer(r.hget(name="signal:"+str(filename), key='z'),
-                               dtype=np.float32)
+    def get_signal(filename):
+        # get the data from redis and create a multi-axis signal
 
-        signal = {
-            'x': x_axis,
-            'y': y_axis,
-            'z': z_axis
-        }
-        data_chunk = pd.DataFrame(signal)
+        signals = r.hmget(name="signal:"+str(filename), keys=['x', 'y', 'z'])
+        np_signals = []
+        for signal in signals:
+            np_signals.append(np.frombuffer(signal, dtype=np.float32))
 
-        return data_chunk
+        stacked = np.stack(np_signals, axis=0)
+
+        return stacked
 
 
 class Waveform(Data):
@@ -57,7 +50,13 @@ class Waveform(Data):
 
     def view_waveform(self):
         filename = str(self.files)
-        data_df = self.get_df(self.files)
+        signal = self.get_signal(self.files)
+        data_dict = {
+            'x': signal[0],
+            'y': signal[1],
+            'z': signal[2]
+        }
+        data_df = pd.DataFrame(data_dict)
         sampling_freq = int(r.hget(name='signal:'+filename, key='sampling_f'))
         if self.duration_in_seconds == 'full':
             data_chunk = data_df.copy()
@@ -90,47 +89,25 @@ class FFT(Data):
         # data_chunk_waveform = self.get_df(filename)
         sampling_freq = int(r.hget(name='signal:'+str(filename),
                             key='sampling_f'))
-        signal_x = np.frombuffer(r.hget(name="signal:"+str(filename), key='x'),
-                                 dtype=np.float32)
-        signal_y = np.frombuffer(r.hget(name="signal:"+str(filename), key='y'),
-                                 dtype=np.float32)
-        signal_z = np.frombuffer(r.hget(name="signal:"+str(filename), key='z'),
-                                 dtype=np.float32)
+        signal = self.get_signal(filename=filename)
 
-        signal = {
-            'x': signal_x,
-            'y': signal_y,
-            'z': signal_z
-        }
-        data_chunk = pd.DataFrame(signal)
+        if r.exists('tensor:'+str(filename)) == 0:
+            out = con.tensorset('tensor:'+str(filename), signal)
+        if r.exists('fft:'+str(filename)) == 0:
+            out1 = con.modelrun('model:fft', 'tensor:'+str(filename),
+                                'fft:'+str(filename))
 
-        if processed_signals[int(filename)] == 0:
-            outx = con.tensorset('tensor:'+str(filename)+':x', signal_x)
-            outy = con.tensorset('tensor:'+str(filename)+':y', signal_y)
-            outz = con.tensorset('tensor:'+str(filename)+':z', signal_z)
-            outx1 = con.modelrun('model:fft', 'tensor:'+str(filename)+':x',
-                                 'fft:'+str(filename)+':x')
-            outy1 = con.modelrun('model:fft', 'tensor:'+str(filename)+':y',
-                                 'fft:'+str(filename)+':y')
-            outz1 = con.modelrun('model:fft', 'tensor:'+str(filename)+':z',
-                                 'fft:'+str(filename)+':z')
-            processed_signals[int(filename)] = 1
         if debug:
-            print(outx)
-            print(outy)
-            print(outz)
-            print(outx1)
-            print(outy1)
-            print(outz1)
+            print(out)
+            print(out1)
 
-        fft_x = con.tensorget('fft:'+str(filename)+':x')
-        fft_y = con.tensorget('fft:'+str(filename)+':y')
-        fft_z = con.tensorget('fft:'+str(filename)+':z')
+        spectrum = con.tensorget('fft:'+str(filename))
         fft_all = {
-            'x': fft_x,
-            'y': fft_y,
-            'z': fft_z
+            'x': spectrum[0],
+            'y': spectrum[1],
+            'z': spectrum[2]
         }
+
         data_chunk = pd.DataFrame(fft_all)
         data_chunk['frequency'] = np.linspace(
             0, sampling_freq // 2, len(data_chunk)
@@ -145,7 +122,11 @@ class FFT(Data):
         )
         data_panel = pn.pane.HoloViews(data_plot, linked_axes=False)
 
-        return data_panel
+        status = r.hget(name='signal:'+str(filename), key='status')
+        status_panel = pn.pane.Str(f"Status: {status.decode('utf-8')}")
+
+        row = pn.Row(data_panel, status_panel)
+        return row
 
 
 class Spectrogram(Data):
@@ -163,18 +144,7 @@ class Spectrogram(Data):
         filename = self.files
         sampling_freq = int(r.hget(name='signal:'+str(filename),
                             key='sampling_f'))
-        signal_x = np.frombuffer(r.hget(name="signal:"+str(filename), key='x'),
-                                 dtype=np.float32)
-        signal_y = np.frombuffer(r.hget(name="signal:"+str(filename), key='y'),
-                                 dtype=np.float32)
-        signal_z = np.frombuffer(r.hget(name="signal:"+str(filename), key='z'),
-                                 dtype=np.float32)
-
-#        signal = {
-#            'x': signal_x,
-#            'y': signal_y,
-#            'z': signal_z
-#        }
+        signal = self.get_signal(filename=filename)
 
         orig_freq = sampling_freq
         transforms_list = []
@@ -200,43 +170,31 @@ class Spectrogram(Data):
 
         transforms = torch.nn.Sequential(*transforms_list)
 
-        # load the transform model to redisai and run it to obtain the output
-        # spectrogram
-
         transform_model = torch.jit.script(transforms)
-        # provvisorio
+        # use a file pointer (BytesIO object) to store the serialized model
+        fp = BytesIO()
 
-        transform_model.save('model.pt')
-        binary_model = ml2rt.load_model('model.pt')
+        torch.jit.save(transform_model, fp)
+
+        fp.seek(0)
+
+        # load the serialized model in binary format so that it can be stored
+        # in Redis
+        binary_model = fp.read()
 
         con.modelstore('model:spectrogram', 'torch', 'cpu', data=binary_model)
 
-        outx = con.tensorset('tensor:'+str(filename)+':x', signal_x)
-        outy = con.tensorset('tensor:'+str(filename)+':y', signal_y)
-        outz = con.tensorset('tensor:'+str(filename)+':z', signal_z)
-        outx1 = con.modelrun('model:spectrogram', 'tensor:'+str(filename)+':x',
-                             'spectrogram:'+str(filename)+':x')
-        outy1 = con.modelrun('model:spectrogram', 'tensor:'+str(filename)+':y',
-                             'spectrogram:'+str(filename)+':y')
-        outz1 = con.modelrun('model:spectrogram', 'tensor:'+str(filename)+':z',
-                             'spectrogram:'+str(filename)+':z')
+        if r.exists('tensor:'+str(filename)) == 0:
+            out = con.tensorset('tensor:'+str(filename), signal)
+
+        out1 = con.modelrun('model:spectrogram', 'tensor:'+str(filename),
+                            'spectrogram:'+str(filename))
+
         if debug:
-            print(outx)
-            print(outy)
-            print(outz)
-            print(outx1)
-            print(outy1)
-            print(outz1)
+            print(out)
+            print(out1)
 
-        spectrogram_x = con.tensorget('spectrogram:'+str(filename)+':x')
-        spectrogram_y = con.tensorget('spectrogram:'+str(filename)+':y')
-        spectrogram_z = con.tensorget('spectrogram:'+str(filename)+':z')
-
-        mel_spectrogram = {
-            'x': spectrogram_x,
-            'y': spectrogram_y,
-            'z': spectrogram_z
-        }
+        spectrogram = con.tensorget('spectrogram:'+str(filename))
 
         plots = []
 
@@ -249,8 +207,8 @@ class Spectrogram(Data):
         for i, m in enumerate(frequencies):
             yticks.append((i, f'{m:.0f}'))
 
-        for c in mel_spectrogram.keys():
-            mel = mel_spectrogram[c]
+        for c in range(spectrogram.shape[0]):
+            mel = spectrogram[c]
             plot = hv.Image(
                 mel,
                 bounds=(0, 0, mel.shape[1], mel.shape[0]),
@@ -260,14 +218,16 @@ class Spectrogram(Data):
 
         layout = hv.Layout(plots)
 
-        return layout
+        status = r.hget(name='signal:'+str(filename), key='status')
+        status_panel = pn.pane.Str(f"Status: {status.decode('utf-8')}")
+
+        row = pn.Row(layout, status_panel)
+        return row
 
 
 layout = pn.Column()
 waveform1 = Waveform()
 layout.append(pn.Row(waveform1.param, waveform1.view_waveform))
-waveform2 = Waveform()
-layout.append(pn.Row(waveform2.param, waveform2.view_waveform))
 fft1 = FFT()
 layout.append(pn.Row(fft1.param, fft1.view_fft))
 spectrogram1 = Spectrogram()
